@@ -209,3 +209,118 @@ if(strcmp(sender,"The Knights")==0)
 sprintf(msg,"[%s]: %s",sender,buffer);
 broadcast(msg,sd);
 ```
+**navi.c**
+libary yang dipakai pada navi.c
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <pthread.h>
+#include "protocol.h"
+```
+variabel global yang menyimpan socket client untuk komunikasi dengan server
+```c
+int sock;
+```
+fungsi ini berjalan sebgai thread yang bertugas untuk menerima pesan dari server secara terus-menurus dan menampilkan pesan ke layar
+```c
+void *receive_message(void *arg)
+{
+    char buffer[BUFFER_SIZE];
+
+    while(1)
+    {
+        int valread = recv(sock, buffer, BUFFER_SIZE-1, 0);
+        if(valread > 0)
+        {
+            buffer[valread] = '\0';
+            printf("%s\n", buffer);
+        }
+    }
+}
+```
+lalau deklarasi variable di main
+* server_addr = menyimpan alamat server
+* thread_id = idenrifier thread
+* name = menyimpan username
+```c
+struct sockaddr_in server_addr;
+pthread_t thread_id;
+char name[50];
+```
+membuat socket TCP untuk client
+```c
+sock = socket(AF_INET, SOCK_STREAM, 0);
+```
+lalu kongfigurasi server
+```c
+server_addr.sin_family = AF_INET;
+server_addr.sin_port = htons(PORT);
+inet_pton(AF_INET, "127.0.0.1", &server_addr.sin_addr);
+```
+client mencoba terhubung ke server
+```c
+connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr));
+```
+lalu input username
+```c
+printf("Enter your name: ");
+fgets(name, sizeof(name), stdin);
+name[strcspn(name, "\n")] = 0;
+```
+validasi admin dan password yang mana jika username adalah admin, client akan meminta password terlebih dahalu, jika password salah maka program langsung berhenti. jika benar akan menampilkan menu khusus untuk admin
+```c
+if(strcmp(name, "The Knights") == 0)
+{
+    char password[50];
+
+    printf("Enter password: ");
+    fgets(password, sizeof(password), stdin);
+    password[strcspn(password, "\n")] = 0;
+if(strcmp(password, ADMIN_PASSWORD) != 0)
+{
+    printf("Wrong password!\n");
+    return 0;
+}
+printf("1. Check Active Entities\n");
+printf("2. Check Server Uptime\n");
+printf("3. Execute Emergency Shutdown\n");
+printf("4. Disconnect\n");
+```
+lalu mengerim usernmae ke server setelah validasi selesai dan membuat thread untuk menjlankan fungsi receive_message
+```c
+send(sock, name, strlen(name), 0);
+pthread_create(&thread_id, NULL, receive_message, NULL);
+```
+loop untuk membaca input user dan mengirim pesan ke server
+```c
+while(1)
+{
+    char message[BUFFER_SIZE];
+    scanf(" %[^\n]", message);
+```
+mapping menu admin ke RPC 
+```c
+if(strcmp(name,"The Knights")==0)
+{
+    if(strcmp(message,"1")==0) strcpy(message,"/active");
+    else if(strcmp(message,"2")==0) strcpy(message,"/uptime");
+    else if(strcmp(message,"3")==0) strcpy(message,"/shutdown");
+    else if(strcmp(message,"4")==0) strcpy(message,"/exit");
+}
+```
+lalu mengirim pesan(chat atau command) ke server
+```c
+send(sock, message, strlen(message), 0);
+```
+dan keluar dari program, jika user memilih kelua maka socket ditutup dan program berhenti
+```c
+if(strcmp(message,"/exit")==0)
+{
+    close(sock);
+    break;
+}
+```
+
