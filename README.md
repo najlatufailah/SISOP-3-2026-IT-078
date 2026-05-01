@@ -324,3 +324,17 @@ if(strcmp(message,"/exit")==0)
 }
 ```
 
+output wired
+<img width="1233" height="32" alt="Tangkapan Layar 2026-05-01 pukul 22 30 00" src="https://github.com/user-attachments/assets/11cb54dd-7d2d-48fb-b08f-a08180148a05" />
+
+output client 1 + jika masuk sebagai admin
+<img width="1470" height="956" alt="Tangkapan Layar 2026-05-01 pukul 22 28 58" src="https://github.com/user-attachments/assets/cac47617-3396-4646-b908-dcb6c862ca4d" />
+
+output cilent 2<img width="1470" height="956" alt="Tangkapan Layar 2026-05-01 pukul 22 29 00" src="https://github.com/user-attachments/assets/e95d71d2-5070-4236-b306-727280da64f8" />
+
+history.log
+<img width="640" height="155" alt="Tangkapan Layar 2026-05-01 pukul 22 33 11" src="https://github.com/user-attachments/assets/a4daed69-4323-4a46-8137-2338a1f457e7" />
+
+
+
+
